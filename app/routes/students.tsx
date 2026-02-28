@@ -1,3 +1,11 @@
-export default function Students() {
-  return <h1>Hello World</h1>;
+import DashboardLayout from "~/components/layouts/dashboard-layout"
+
+const Students = () => {
+    return (
+        <DashboardLayout>
+            <>Content</>
+        </DashboardLayout>
+    )
 }
+
+export default Students
