@@ -26,7 +26,6 @@ const DashboardSidebar = ({ menus }: {
         )
     }
 
-
     return (
         <Sidebar variant="floating" className="pe-0 bg-gray-200">
 
