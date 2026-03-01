@@ -2,7 +2,7 @@ import { ChevronDown, DoorClosed } from "lucide-react"
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem, useSidebar } from "../ui/sidebar"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
 import { Link, useLocation } from "react-router"
-import type { menuItemsType } from "../types/layout-type"
+import type { menuItemsType } from "~/types/layout-type"
 
 const DashboardSidebar = ({ menus }: {
     menus: menuItemsType[]
