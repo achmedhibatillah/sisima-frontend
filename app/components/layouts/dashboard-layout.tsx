@@ -2,10 +2,8 @@ import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar"
 import DashboardSidebar from "./dashboard-sidebar"
 import type React from "react"
 import { Card, CardContent } from "../ui/card"
-import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip"
 import { GraduationCap, Home, UserRound } from "lucide-react"
-import type { ReactNode } from "react"
-import type { menuItemsType } from "../types/layout-type"
+import type { menuItemsType } from "~/types/layout-type"
 
 const DashboardLayout = ({
     children
