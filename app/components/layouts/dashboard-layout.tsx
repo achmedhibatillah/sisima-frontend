@@ -49,7 +49,7 @@ const DashboardLayout = ({
         >
             <DashboardSidebar menus={menus} />
             <main className="bg-gray-200 p-2 flex flex-col w-full">
-                <Card className="p-2 mb-2 w-full sticky">
+                <Card className="p-2 mb-2 w-full sticky top-2">
                     <CardContent className="px-2">
                         <div className="flex items-center">
                             <SidebarTrigger />
@@ -60,6 +60,10 @@ const DashboardLayout = ({
                     </CardContent>
                 </Card>
                 {children}
+
+                <Card className="mt-2 p-3">
+                    <CardContent className="px-3 text-gray-400 text-sm font-light text-center">© 2026 SISIMA. All rights reserved.</CardContent>
+                </Card>
             </main>
         </SidebarProvider>
     )
