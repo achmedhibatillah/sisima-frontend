@@ -49,7 +49,7 @@ const DashboardLayout = ({
         >
             <DashboardSidebar menus={menus} />
             <main className="bg-gray-200 p-2 flex flex-col w-full">
-                <Card className="p-2 mb-2 w-full sticky top-2">
+                <Card className="p-2 mb-2 w-full sticky top-2 z-1">
                     <CardContent className="px-2">
                         <div className="flex items-center">
                             <SidebarTrigger />
