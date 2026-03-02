@@ -16,14 +16,14 @@ export function ClassInput({
 }) {
 
     const items = [
-        { value: "0", label: <div className="text-muted-foreground">No data</div> },
+        { value: "N", label: <div className="text-muted-foreground">No data</div> },
         { value: "1", label: <>Kelas 1</> },
         { value: "2", label: <>Kelas 2</> },
         { value: "3", label: <>Kelas 3</> },
         { value: "4", label: <>Kelas 4</> },
         { value: "5", label: <>Kelas 5</> },
         { value: "6", label: <>Kelas 6</> },
-        { value: "7", label: <>Lulus</> },
+        { value: "L", label: <>Lulus</> },
     ] as const
 
     return (
