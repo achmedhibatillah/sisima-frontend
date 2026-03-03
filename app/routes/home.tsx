@@ -2,7 +2,7 @@ import DashboardLayout from "~/components/layouts/dashboard-layout"
 
 const MainPage = () => {
     return (
-        <DashboardLayout>
+        <DashboardLayout pageNow="Dashboard">
             <>Main Page</>
         </DashboardLayout>
     )
