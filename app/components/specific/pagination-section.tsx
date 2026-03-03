@@ -8,6 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "../ui/pagination"
+import { Info, NotebookText } from "lucide-react"
 
 type Props = {
     meta?: MetaPaginationType
@@ -17,43 +18,22 @@ type Props = {
 
 type Slot = number | "ellipsis" | null
 
-const PaginationSection = ({
-    meta,
-    currentPage,
-    onChangePage,
-}: Props) => {
+const PaginationSection = ({ meta, currentPage, onChangePage }: Props) => {
     if (!meta || meta.total_pages <= 1) return null
 
     const total = meta.total_pages
+    let slots: Slot[] = []
 
-    const slots: Slot[] = [null, null, null, null, null, null, null]
-
-    if (currentPage <= 3) {
-        slots[0] = 1
-        slots[1] = 2
-        slots[2] = 3
-        slots[3] = 4
-        slots[4] = "ellipsis"
-        slots[5] = total
-    }
-
-    else if (currentPage >= total - 2) {
-        slots[0] = 1
-        slots[1] = "ellipsis"
-        slots[2] = total - 3
-        slots[3] = total - 2
-        slots[4] = total - 1
-        slots[5] = total
-    }
-
-    else {
-        slots[0] = 1
-        slots[1] = "ellipsis"
-        slots[2] = currentPage - 1
-        slots[3] = currentPage
-        slots[4] = currentPage + 1
-        slots[5] = "ellipsis"
-        slots[6] = total
+    if (total <= 7) {
+        slots = Array.from({ length: total }, (_, i) => i + 1)
+    } else {
+        if (currentPage <= 4) {
+            slots = [1, 2, 3, 4, 5, "ellipsis", total]
+        } else if (currentPage >= total - 3) {
+            slots = [1, "ellipsis", total - 4, total - 3, total - 2, total - 1, total]
+        } else {
+            slots = [1, "ellipsis", currentPage - 1, currentPage, currentPage + 1, "ellipsis", total]
+        }
     }
 
     return (
@@ -76,16 +56,12 @@ const PaginationSection = ({
                         )
                     }
 
-                    if (slot === null) {
-                        return <PaginationItem key={i} className="w-9" />
-                    }
-
                     return (
                         <PaginationItem key={i}>
                             <PaginationLink
                                 className="cursor-pointer w-9 text-center"
                                 isActive={slot === currentPage}
-                                onClick={() => onChangePage(slot)}
+                                onClick={() => onChangePage(slot as number)}
                             >
                                 {slot}
                             </PaginationLink>
@@ -96,9 +72,7 @@ const PaginationSection = ({
                 <PaginationItem>
                     <PaginationNext
                         className="cursor-pointer"
-                        onClick={() =>
-                            currentPage < total && onChangePage(currentPage + 1)
-                        }
+                        onClick={() => currentPage < total && onChangePage(currentPage + 1)}
                     />
                 </PaginationItem>
 
@@ -107,4 +81,30 @@ const PaginationSection = ({
     )
 }
 
-export default PaginationSection
+type PaginationInfoProps = {
+    meta?: MetaPaginationType
+    currentPage: number
+    limit: number
+}
+
+const PaginationInfo = ({ meta, currentPage, limit }: PaginationInfoProps) => {
+    if (!meta || meta.total_items === 0) return null
+
+    const start = (currentPage - 1) * limit + 1
+    const end = Math.min(currentPage * limit, meta.total_items)
+    const totalPages = meta.total_pages
+
+    return (
+        <div className="flex flex-col sm:flex-row sm:items-center text-sm justify-between gap-2 text-gray-500">
+            <div className="flex items-center gap-2">
+                <NotebookText className="size-4" />
+                <span className="font-light">Menampilkan <b>{start}-{end}</b> dari <b>{meta.total_items}</b> data.</span>{" "}
+            </div>
+            <div className="font-light flex items-center gap-1">
+                <span>Halaman <b>{currentPage}</b> dari <b>{totalPages}</b>.</span>
+            </div>
+        </div>
+    )
+}
+
+export { PaginationSection, PaginationInfo }

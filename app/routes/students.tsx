@@ -1,10 +1,10 @@
 import axios from "axios"
-import { Search } from "lucide-react"
+import { CloudAlert, ListX, Search } from "lucide-react"
 import { useEffect, useState } from "react"
 import { useSearchParams } from "react-router"
 import DashboardLayout from "~/components/layouts/dashboard-layout"
 import GenderView from "~/components/specific/gender-view"
-import PaginationSection from "~/components/specific/pagination-section"
+import { PaginationInfo, PaginationSection } from "~/components/specific/pagination-section"
 import { Button } from "~/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
 import { Field, FieldGroup, FieldLabel } from "~/components/ui/field"
@@ -12,7 +12,9 @@ import { Input } from "~/components/ui/input"
 import { InputDropdown } from "~/components/ui/input-dropdown"
 import { Skeleton } from "~/components/ui/skeleton"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "~/components/ui/table"
+import { appConfig } from "~/config"
 import { showRelativeDateTime } from "~/helpers/date-helper"
+import { getErrorMessage } from "~/helpers/errors-network"
 import highlightKeyword from "~/helpers/highlight-text"
 import { cn } from "~/lib/utils"
 import type { MetaPaginationType } from "~/types/meta-type"
@@ -56,10 +58,21 @@ const Students = () => {
     const setSort = (s: string) => updateParams({ page: "1", sort: s })
     const setGender = (g: string) => updateParams({ page: "1", gender: g })
     const setClass = (c: string) => updateParams({ page: "1", class: c })
-    const setKeyword = (k: string) => updateParams({ page: "1", k })
+
+    const [searchFocus, setSearchFocus] = useState(false)
+    const [inputValue, setInputValue] = useState(keyword)
+    const [debouncedKeyword, setDebouncedKeyword] = useState(keyword)
+    useEffect(() => {
+        const handler = setTimeout(() => {
+            setDebouncedKeyword(inputValue)
+        }, 500)
+
+        return () => clearTimeout(handler)
+    }, [inputValue])
 
     useEffect(() => {
-        setLoading(true);
+        if (debouncedKeyword) setPage(1)
+        setLoading(true)
 
         const params: Record<string, string> = {
             page: page.toString(),
@@ -68,26 +81,41 @@ const Students = () => {
             gender: genderFilter,
             class: classFilter,
         }
-        if (keyword) params.k = keyword
+        if (debouncedKeyword) {
+            params.k = debouncedKeyword
+        }
 
         const queryString = new URLSearchParams(params).toString()
 
         axios
-            .get(`http://127.0.0.1:8888/student?${queryString}`, { timeout: 5000 })
+            .get(`${appConfig.api}/student?${queryString}`, { timeout: 5000 })
             .then((res) => {
                 setStudents(res.data.data)
                 setMeta(res.data.meta)
+
+                setSearchParams(_ => {
+                    const merged = {
+                        page: page.toString() ?? "1",
+                        limit,
+                        sort,
+                        gender: genderFilter,
+                        class: classFilter,
+                        k: debouncedKeyword,
+                    }
+                    const filtered = Object.fromEntries(
+                        Object.entries(merged).filter(([_, v]) => v !== undefined && v !== "")
+                    )
+                    return filtered
+                })
             })
-            .catch(() => {
-                setError("Gagal memuat data siswa")
+            .catch((e) => {
+                setError(e)
             })
             .finally(() => setLoading(false))
-    }, [page, limit, sort, genderFilter, classFilter, keyword])
-
-    const [searchFocus, setSearchFocus] = useState(false)
+    }, [page, limit, sort, genderFilter, classFilter, debouncedKeyword])
 
     return (
-        <DashboardLayout>
+        <DashboardLayout pageNow="Database Siswa">
             <Card className="py-8">
                 <CardHeader>
                     <CardTitle className="text-gray-500 text-2xl">
@@ -100,8 +128,11 @@ const Students = () => {
                                 <Input
                                     onFocus={() => setSearchFocus(true)}
                                     onBlur={() => setSearchFocus(false)}
-                                    value={keyword}
-                                    onChange={(e) => setKeyword(e.target.value)}
+                                    value={inputValue}
+                                    onChange={(e) => {
+                                        setPage(1)
+                                        setInputValue(e.target.value)
+                                    }}
                                     placeholder="Cari berdasarkan nama, NIS, atau NISN..."
                                 />
                             </div>
@@ -157,67 +188,81 @@ const Students = () => {
 
                     {error ? (
                         <div className="flex flex-col items-center gap-3 py-20 text-muted-foreground">
-                            <p>Gagal memuat data.</p>
-                            <Button
-                                variant="outline"
-                                onClick={() => setPage(page)}
-                            >
-                                Coba lagi
-                            </Button>
+                            <CloudAlert size={50} className="text-gray-400" />
+                            <p className="-mb-2">Gagal memuat data.</p>
+                            <p className="text-red-500 font-light">{getErrorMessage(error)}</p>
+                            <div className="inline">
+                                <Button variant="outline" onClick={() => window.location.href = '/students'} className="cursor-pointer hover:bg-gray-50 w-30 ms-2">Refresh</Button>
+                            </div>
+                        </div>
+                    ) : students.length !== 0 ? (
+                        <div>
+                            <Field className="pb-3">
+                                <PaginationInfo
+                                    meta={meta}
+                                    currentPage={page}
+                                    limit={parseInt(limit)}
+                                />
+                            </Field>
+                            <Table>
+                                <TableHeader>
+                                    <TableRow className="bg-blue-100 hover:bg-blue-100">
+                                        <TableHead className="text-muted-foreground text-end">#</TableHead>
+                                        <TableHead>NIS</TableHead>
+                                        <TableHead>NISN</TableHead>
+                                        <TableHead>Nama Lengkap</TableHead>
+                                        <TableHead>Jenis Kelamin</TableHead>
+                                        <TableHead>Kelas</TableHead>
+                                        <TableHead>Dibuat</TableHead>
+                                        <TableHead>Diubah</TableHead>
+                                    </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                    {loading
+                                        ? Array.from({ length: Number(limit) }).map((_, i) => (
+                                            <TableRow key={i}>
+                                                {[...Array(7)].map((_, i) => (
+                                                    <TableCell key={i}>
+                                                        <Skeleton className="h-5 w-5/6" />
+                                                    </TableCell>
+                                                ))}
+                                            </TableRow>
+                                        ))
+                                        : students.map((student, index) => (
+                                            <TableRow key={student.id}
+                                                className={cn(index % 2 !== 0 && "bg-muted", "cursor-pointer hover:bg-gray-200")}
+                                                onClick={() => window.location.href = '/students/' + student.id}
+                                            >
+                                                <TableCell className="text-end">{(page - 1) * Number(limit) + index + 1}</TableCell>
+                                                <TableCell>{highlightKeyword(student.nis || "-", debouncedKeyword)}</TableCell>
+                                                <TableCell>{highlightKeyword(student.nisn || "-", debouncedKeyword)}</TableCell>
+                                                <TableCell className="font-medium">{highlightKeyword(student.full_name || "-", debouncedKeyword)}</TableCell>
+                                                <TableCell><GenderView gender={student.gender} /></TableCell>
+                                                <TableCell>{student.class}</TableCell>
+                                                <TableCell>{showRelativeDateTime(student.created_at)}</TableCell>
+                                                <TableCell>{showRelativeDateTime(student.updated_at)}</TableCell>
+                                            </TableRow>
+                                        ))}
+                                </TableBody>
+                            </Table>
+                            <div className="mt-10">
+                                <PaginationSection
+                                    meta={meta}
+                                    currentPage={page}
+                                    onChangePage={(p) => setPage(p)}
+                                />
+                            </div>
                         </div>
                     ) : (
-                        <Table>
-                            <TableHeader>
-                                <TableRow className="bg-blue-100 hover:bg-blue-100">
-                                    <TableHead className="text-muted-foreground text-end">#</TableHead>
-                                    <TableHead>NIS</TableHead>
-                                    <TableHead>NISN</TableHead>
-                                    <TableHead>Nama Lengkap</TableHead>
-                                    <TableHead>Jenis Kelamin</TableHead>
-                                    <TableHead>Kelas</TableHead>
-                                    <TableHead>Dibuat</TableHead>
-                                    <TableHead>Diubah</TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {loading
-                                    ? Array.from({ length: Number(limit) }).map((_, i) => (
-                                        <TableRow key={i}>
-                                            {[...Array(7)].map((_, i) => (
-                                                <TableCell key={i}>
-                                                    <Skeleton className="h-5 w-5/6" />
-                                                </TableCell>
-                                            ))}
-                                        </TableRow>
-                                    ))
-                                    : students.map((student, index) => (
-                                        <TableRow key={student.id}
-                                            className={cn(index % 2 !== 0 && "bg-muted", "cursor-pointer hover:bg-gray-200")}
-                                            onClick={() => window.location.href = '/students/' + student.id}
-                                        >
-                                            <TableCell className="text-end">{(page - 1) * Number(limit) + index + 1}</TableCell>
-                                            <TableCell>{highlightKeyword(student.nis || "-", keyword)}</TableCell>
-                                            <TableCell>{highlightKeyword(student.nisn || "-", keyword)}</TableCell>
-                                            <TableCell className="font-medium">{highlightKeyword(student.full_name || "-", keyword)}</TableCell>
-                                            <TableCell><GenderView gender={student.gender} /></TableCell>
-                                            <TableCell>{student.class}</TableCell>
-                                            <TableCell>{showRelativeDateTime(student.created_at)}</TableCell>
-                                            <TableCell>{showRelativeDateTime(student.updated_at)}</TableCell>
-                                        </TableRow>
-                                    ))}
-                            </TableBody>
-                        </Table>
+                        <div className="flex flex-col items-center gap-3 py-20 text-muted-foreground">
+                            <ListX size={50} className="text-gray-400" />
+                            <p>Data tidak tersedia.</p>
+                            <div className="inline">
+                                <Button variant="outline" onClick={() => window.location.href = '/students'} className="cursor-pointer hover:bg-gray-50 w-30">Refresh</Button>
+                            </div>
+                        </div>
                     )}
-
-                    <div className="mt-10">
-                        <PaginationSection
-                            meta={meta}
-                            currentPage={page}
-                            onChangePage={(p) => setPage(p)}
-                        />
-                    </div>
                 </CardContent>
-
             </Card>
         </DashboardLayout>
     )

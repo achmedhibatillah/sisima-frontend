@@ -10,7 +10,7 @@ const highlightKeyword = (text: string, keyword: string): string | React.ReactNo
         regex.test(part) ? (
             <span key={index} className="bg-yellow-200">{part}</span>
         ) : (
-            <>{part}</>
+            <React.Fragment key={index}>{part}</React.Fragment>
         )
     )
 }

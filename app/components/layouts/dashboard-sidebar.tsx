@@ -4,8 +4,9 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 import { Link, useLocation } from "react-router"
 import type { menuItemsType } from "~/types/layout-type"
 
-const DashboardSidebar = ({ menus }: {
+const DashboardSidebar = ({ menus, pageNow }: {
     menus: menuItemsType[]
+    pageNow?: string
 }) => {
     const {
         state,
@@ -22,7 +23,7 @@ const DashboardSidebar = ({ menus }: {
     const isParentActive = (menu: menuItemsType) => {
         if (!menu.sub) return false
         return menu.sub.some(
-            (sub) => location.pathname === sub.url
+            (sub) => pageNow === sub.name
         )
     }
 
@@ -68,7 +69,7 @@ const DashboardSidebar = ({ menus }: {
                                         <SidebarMenuSub className="pe-0 me-0.5">
                                             {menu.sub.map((submenu) => (
                                                 <SidebarMenuSubItem key={submenu.name}>
-                                                    <SidebarMenuSubButton asChild isActive={location.pathname === submenu.url}
+                                                    <SidebarMenuSubButton asChild isActive={pageNow === submenu.name}
                                                         className="
                                                             py-5 ps-3
                                                             cursor-pointer
@@ -110,7 +111,7 @@ const DashboardSidebar = ({ menus }: {
                                     </CollapsibleContent>
                                 </Collapsible>
                             ) : (
-                                <SidebarMenuButton asChild isActive={location.pathname === menu.url}
+                                <SidebarMenuButton asChild isActive={pageNow === menu.name}
                                     className="
                                         py-5 ps-3
                                         rounded-r-none

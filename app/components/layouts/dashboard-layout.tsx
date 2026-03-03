@@ -6,8 +6,10 @@ import { GraduationCap, Home, UserRound } from "lucide-react"
 import type { menuItemsType } from "~/types/layout-type"
 
 const DashboardLayout = ({
+    pageNow,
     children
 }: {
+    pageNow: string,
     children: React.ReactNode
 }) => {
 
@@ -47,7 +49,7 @@ const DashboardLayout = ({
                 } as React.CSSProperties
             }
         >
-            <DashboardSidebar menus={menus} />
+            <DashboardSidebar menus={menus} pageNow={pageNow} />
             <main className="bg-gray-200 p-2 flex flex-col w-full">
                 <Card className="p-2 mb-2 w-full sticky top-2 z-1">
                     <CardContent className="px-2">

@@ -7,11 +7,10 @@ import DashboardLayout from "~/components/layouts/dashboard-layout"
 import ClassInput from "~/components/specific/class-input"
 import GenderInput from "~/components/specific/gender-input"
 import { Button } from "~/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuLabel, DropdownMenuRadioGroup, DropdownMenuRadioItem, DropdownMenuTrigger } from "~/components/ui/dropdown-menu"
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field"
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card"
+import { Field, FieldError, FieldGroup, FieldLabel, FieldSet } from "~/components/ui/field"
 import { Input } from "~/components/ui/input"
-import { InputDropdown } from "~/components/ui/input-dropdown"
+import { appConfig } from "~/config"
 import { filterInput, filterNumberInput } from "~/helpers/input-helper"
 
 const StudentsAddPage = () => {
@@ -49,7 +48,7 @@ const StudentsAddPage = () => {
 
                 const payload = { ...values }
 
-                const response = await axios.post("http://127.0.0.1:8888/student", payload)
+                const response = await axios.post(`${appConfig.api}/student`, payload)
 
                 console.log(response.data)
 
@@ -75,7 +74,7 @@ const StudentsAddPage = () => {
     })
 
     return (
-        <DashboardLayout>
+        <DashboardLayout pageNow="Tambah Data Siswa">
             <Card className="py-8">
                 <CardHeader>
                     <CardTitle className="text-gray-500 text-2xl">Tambah Data Siswa</CardTitle>
