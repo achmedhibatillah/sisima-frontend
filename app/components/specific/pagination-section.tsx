@@ -8,7 +8,7 @@ import {
     PaginationNext,
     PaginationPrevious,
 } from "../ui/pagination"
-import { Info, NotebookText } from "lucide-react"
+import { Info, ListChevronsUpDown, NotebookText } from "lucide-react"
 
 type Props = {
     meta?: MetaPaginationType
@@ -97,10 +97,11 @@ const PaginationInfo = ({ meta, currentPage, limit }: PaginationInfoProps) => {
     return (
         <div className="flex flex-col sm:flex-row sm:items-center text-sm justify-between gap-2 text-gray-500">
             <div className="flex items-center gap-2">
-                <NotebookText className="size-4" />
+                <ListChevronsUpDown className="size-4 w-3" />
                 <span className="font-light">Menampilkan <b>{start}-{end}</b> dari <b>{meta.total_items}</b> data.</span>{" "}
             </div>
             <div className="font-light flex items-center gap-1">
+                <NotebookText className="size-4 w-3" />
                 <span>Halaman <b>{currentPage}</b> dari <b>{totalPages}</b>.</span>
             </div>
         </div>

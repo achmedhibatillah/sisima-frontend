@@ -142,7 +142,7 @@ const Students = () => {
                             <InputDropdown
                                 value={sort}
                                 onChange={setSort}
-                                items={[{ value: 'full_name', label: (<>Nama lengkap</>) }, { value: 'created_at', label: (<>Waktu dibuat</>) }, { value: 'updated_at', label: (<>Waktu diubah</>) }]}
+                                items={[{ value: 'full_name', label: (<>Nama lengkap</>) }, { value: 'created_at', label: (<>Terakhir dibuat</>) }, { value: 'updated_at', label: (<>Terakhir diubah</>) }]}
                                 size="sm"
                                 showChevronInButton={true}
                             />

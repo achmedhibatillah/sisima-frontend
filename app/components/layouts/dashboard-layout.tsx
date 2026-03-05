@@ -40,6 +40,7 @@ const DashboardLayout = ({
             ]
         }
     ]
+
     return (
         <SidebarProvider
             style={
