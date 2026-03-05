@@ -2,7 +2,7 @@ import { SidebarProvider, SidebarTrigger } from "~/components/ui/sidebar"
 import DashboardSidebar from "./dashboard-sidebar"
 import type React from "react"
 import { Card, CardContent } from "../ui/card"
-import { GraduationCap, Home, UserRound } from "lucide-react"
+import { BanknoteArrowUp, GraduationCap, HandCoins, Home, UserRound, Wallet } from "lucide-react"
 import type { menuItemsType } from "~/types/layout-type"
 
 const DashboardLayout = ({
@@ -38,8 +38,48 @@ const DashboardLayout = ({
                     sub: null
                 },
             ]
-        }
+        },
+
+        {
+            name: "Tagihan",
+            url: "",
+            icon: <HandCoins />,
+            sub: [
+                {
+                    name: "Riwayat Tagihan",
+                    url: "/bills",
+                    icon: null,
+                    sub: null
+                },
+                {
+                    name: "Tambah Tagihan",
+                    url: "/bills/add",
+                    icon: null,
+                    sub: null
+                },
+            ]
+        },
+        {
+            name: "Pembayaran",
+            url: "",
+            icon: <BanknoteArrowUp />,
+            sub: [
+                {
+                    name: "Riwayat Pembayaran",
+                    url: "/payments",
+                    icon: null,
+                    sub: null
+                },
+                {
+                    name: "Catat Pembayaran Offline",
+                    url: "/payments/add",
+                    icon: null,
+                    sub: null
+                },
+            ]
+        },
     ]
+
     return (
         <SidebarProvider
             style={
